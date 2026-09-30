@@ -62,6 +62,7 @@ trap rollback ERR
 if [ "$FORCE" = 1 ] || echo "$CHANGED" | grep -qE '(^|/)package(-lock)?\.json$'; then
   info "Dépendances modifiées : npm ci"
   npm ci --no-audit --no-fund
+  (cd apps/api && npx prisma generate)
 fi
 
 if [ "$FORCE" = 1 ] || echo "$CHANGED" | grep -q '^apps/api/prisma/'; then

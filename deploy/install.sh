@@ -85,6 +85,9 @@ mkdir -p "$ROOT_DIR/apps/api/uploads"
 # ── Dépendances, schéma, build ───────────────────────────────────────────────
 info "Installation des dépendances npm"
 (cd "$ROOT_DIR" && npm ci --no-audit --no-fund)
+# Le schéma est dans apps/api : npm ci ne génère pas le client Prisma tout seul.
+info "Génération du client Prisma"
+(cd "$ROOT_DIR/apps/api" && npx prisma generate)
 info "Migrations de la base"
 (cd "$ROOT_DIR/apps/api" && npx prisma migrate deploy)
 if [ "$SEED" = 1 ]; then
