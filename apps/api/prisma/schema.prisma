@@ -1,0 +1,324 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OfficerStatus {
+  actif
+  suspendu
+  inactif
+}
+
+enum AdminRole {
+  super_admin
+  commandant
+  tresorier
+  superviseur
+}
+
+enum AdminStatus {
+  actif
+  en_attente
+  revoque
+}
+
+enum VehicleType {
+  VP
+  Moto
+  Camion
+  Bus
+}
+
+enum ContraventionStatus {
+  impayee
+  partielle
+  payee
+  annulee
+}
+
+enum Canal {
+  mobile
+  admin
+}
+
+enum PaymentMode {
+  especes
+  wave
+  orange_money
+  carte
+}
+
+enum PaymentStatus {
+  en_attente
+  confirme
+  echoue
+}
+
+enum PaymentChannel {
+  officer
+  usager
+  admin
+}
+
+enum ActorType {
+  admin
+  officer
+  user
+  system
+}
+
+/// Zone de police : commissariat de zone (Dakar) ou commissariat régional.
+model Zone {
+  id            String          @id @default(cuid())
+  code          String          @unique
+  nom           String
+  commissariat  String
+  region        String
+  isDakar       Boolean         @default(false)
+  lat           Float
+  lng           Float
+  officers      Officer[]
+  admins        Admin[]
+  contraventions Contravention[]
+}
+
+model Officer {
+  id            String          @id @default(cuid())
+  matricule     String          @unique
+  prenom        String
+  nom           String
+  grade         String
+  zoneId        String
+  zone          Zone            @relation(fields: [zoneId], references: [id])
+  telephone     String?
+  email         String?
+  photoUrl      String?
+  statut        OfficerStatus   @default(actif)
+  passwordHash  String
+  /// Incrémenté à chaque suspension / reset : invalide les jetons existants.
+  tokenVersion  Int             @default(0)
+  lang          String          @default("fr")
+  lastSeenAt    DateTime?
+  /// Motif obligatoire de la dernière suspension (traçabilité disciplinaire)
+  suspensionMotif String?
+  suspendedAt   DateTime?
+  suspendedBy   String?
+  createdAt     DateTime        @default(now())
+  contraventions Contravention[]
+  payments      Payment[]
+
+  @@index([zoneId])
+}
+
+model Admin {
+  id            String      @id @default(cuid())
+  nom           String
+  email         String      @unique
+  role          AdminRole
+  zoneId        String?
+  zone          Zone?       @relation(fields: [zoneId], references: [id])
+  statut        AdminStatus @default(actif)
+  passwordHash  String?
+  tokenVersion  Int         @default(0)
+  lastLoginAt   DateTime?
+  createdAt     DateTime    @default(now())
+}
+
+model Owner {
+  id           String       @id @default(cuid())
+  prenom       String
+  nom          String
+  cni          String       @unique
+  telephone    String
+  adresse      String?
+  quartier     String?
+  email        String?
+  photoCniUrl  String?
+  createdAt    DateTime     @default(now())
+  vehicles     Vehicle[]
+  account      UserAccount?
+  payments     Payment[]
+
+  @@index([telephone])
+}
+
+/// Compte de l'application citoyenne (Espace Usager), lié à un propriétaire.
+model UserAccount {
+  id            String    @id @default(cuid())
+  ownerId       String    @unique
+  owner         Owner     @relation(fields: [ownerId], references: [id])
+  telephone     String    @unique
+  passwordHash  String
+  twoFactor     Boolean   @default(true)
+  biometric     Boolean   @default(false)
+  lang          String    @default("fr")
+  tokenVersion  Int       @default(0)
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  otps          OtpCode[]
+}
+
+model OtpCode {
+  id         String      @id @default(cuid())
+  userId     String
+  user       UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash   String
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime    @default(now())
+}
+
+model Vehicle {
+  id             String          @id @default(cuid())
+  plaque         String          @unique
+  marque         String
+  modele         String
+  couleur        String?
+  annee          Int?
+  type           VehicleType     @default(VP)
+  carburant      String?
+  chassis        String?
+  ownerId        String
+  owner          Owner           @relation(fields: [ownerId], references: [id])
+  assuranceExp   DateTime?
+  visiteTechExp  DateTime?
+  carteGriseOk   Boolean         @default(true)
+  flagged        Boolean         @default(false)
+  flagReason     String?
+  createdAt      DateTime        @default(now())
+  contraventions Contravention[]
+
+  @@index([ownerId])
+}
+
+model InfractionType {
+  id            String              @id @default(cuid())
+  code          String              @unique
+  libelle       String
+  montantDefaut Int
+  icone         String              @default("warning")
+  actif         Boolean             @default(true)
+  deletedAt     DateTime?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  items         ContraventionItem[]
+}
+
+model Contravention {
+  id             String              @id @default(cuid())
+  numero         String              @unique
+  vehicleId      String
+  vehicle        Vehicle             @relation(fields: [vehicleId], references: [id])
+  officerId      String?
+  officer        Officer?            @relation(fields: [officerId], references: [id])
+  zoneId         String
+  zone           Zone                @relation(fields: [zoneId], references: [id])
+  montantTotal   Int
+  montantPaye    Int                 @default(0)
+  lieuTexte      String?
+  lat            Float?
+  lng            Float?
+  dateHeure      DateTime
+  photoPreuveUrl String?
+  notes          String?
+  statut         ContraventionStatus @default(impayee)
+  canal          Canal               @default(mobile)
+  /// UUID généré par le terminal (mode hors-ligne) : garantit l'idempotence.
+  clientUuid     String?             @unique
+  createdAt      DateTime            @default(now())
+  items          ContraventionItem[]
+  allocations    PaymentAllocation[]
+
+  @@index([dateHeure])
+  @@index([statut])
+  @@index([zoneId, dateHeure])
+  @@index([officerId, dateHeure])
+  @@index([vehicleId, statut])
+}
+
+model ContraventionItem {
+  id               String         @id @default(cuid())
+  contraventionId  String
+  contravention    Contravention  @relation(fields: [contraventionId], references: [id], onDelete: Cascade)
+  infractionTypeId String
+  infractionType   InfractionType @relation(fields: [infractionTypeId], references: [id])
+  /// Montant figé au moment de l'émission.
+  montant          Int
+
+  @@index([contraventionId])
+  @@index([infractionTypeId])
+}
+
+model Payment {
+  id               String              @id @default(cuid())
+  numeroRecu       String?             @unique
+  officerId        String?
+  officer          Officer?            @relation(fields: [officerId], references: [id])
+  ownerId          String?
+  owner            Owner?              @relation(fields: [ownerId], references: [id])
+  mode             PaymentMode
+  referenceExterne String?
+  montant          Int
+  dateHeure        DateTime            @default(now())
+  statut           PaymentStatus       @default(en_attente)
+  canal            PaymentChannel
+  checkoutUrl      String?
+  idempotencyKey   String?             @unique
+  createdAt        DateTime            @default(now())
+  allocations      PaymentAllocation[]
+
+  @@index([dateHeure])
+  @@index([statut, dateHeure])
+}
+
+model PaymentAllocation {
+  paymentId       String
+  payment         Payment       @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  contraventionId String
+  contravention   Contravention @relation(fields: [contraventionId], references: [id])
+  montant         Int
+
+  @@id([paymentId, contraventionId])
+  @@index([contraventionId])
+}
+
+model Notification {
+  id              String    @id @default(cuid())
+  destinataireType ActorType
+  destinataireId  String
+  type            String
+  titre           String
+  corps           String
+  lu              Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+
+  @@index([destinataireType, destinataireId, createdAt])
+}
+
+model AuditLog {
+  id        String    @id @default(cuid())
+  actorType ActorType
+  actorId   String?
+  action    String
+  entity    String
+  entityId  String?
+  diff      Json?
+  createdAt DateTime  @default(now())
+
+  @@index([entity, entityId])
+}
+
+model Setting {
+  key   String @id
+  value Json
+}
+
+/// Compteurs pour la numérotation CNT-AAAA-NNNNN / RCU-AAAA-NNNNN.
+model Counter {
+  key   String @id
+  value Int    @default(0)
+}

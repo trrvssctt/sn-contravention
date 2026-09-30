@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:16
+    container_name: sen-db
+    environment:
+      POSTGRES_USER: sen
+      POSTGRES_PASSWORD: sen
+      POSTGRES_DB: sen_contraventions
+    ports:
+      - "5433:5432"
+    volumes:
+      - sen-db-data:/var/lib/postgresql/data
+volumes:
+  sen-db-data:

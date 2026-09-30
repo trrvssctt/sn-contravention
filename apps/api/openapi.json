@@ -1,0 +1,3606 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1/auth/officer/login": {
+      "post": {
+        "operationId": "AuthController_officerLogin",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfficerLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokensDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Connexion App Officier (matricule + mot de passe). HTTP 423 si l'agent est suspendu.",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/user/login": {
+      "post": {
+        "operationId": "AuthController_userLogin",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokensDto"
+                    },
+                    {
+                      "$ref": "#/components/schemas/OtpChallengeDto"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Connexion Espace Usager. Si la 2FA est active, renvoie un défi OTP (SMS) à valider via /auth/user/verify-otp.",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/user/register": {
+      "post": {
+        "operationId": "AuthController_userRegister",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OtpChallengeDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Création de compte usager : lie le compte au propriétaire (CNI + téléphone), puis OTP SMS.",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/user/verify-otp": {
+      "post": {
+        "operationId": "AuthController_verifyOtp",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOtpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokensDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/admin/login": {
+      "post": {
+        "operationId": "AuthController_adminLogin",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokensDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/admin/activate": {
+      "post": {
+        "operationId": "AuthController_activate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivateAdminDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokensDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Activation d'un compte admin invité (lien reçu par email).",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refresh",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokensDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Renouvelle la paire de jetons (tous profils).",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/me": {
+      "get": {
+        "operationId": "AuthController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Profil de l'acteur connecté.",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/dashboard/kpis": {
+      "get": {
+        "operationId": "DashboardController_kpis",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "KPI de la période + valeurs de la période précédente (variations calculées côté client).",
+        "tags": [
+          "Tableau de bord"
+        ]
+      }
+    },
+    "/v1/dashboard/series": {
+      "get": {
+        "operationId": "DashboardController_series",
+        "parameters": [
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Tableau de bord"
+        ]
+      }
+    },
+    "/v1/dashboard/by-type": {
+      "get": {
+        "operationId": "DashboardController_byType",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Tableau de bord"
+        ]
+      }
+    },
+    "/v1/dashboard/by-zone": {
+      "get": {
+        "operationId": "DashboardController_byZone",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Répartition du mois par zone de Dakar.",
+        "tags": [
+          "Tableau de bord"
+        ]
+      }
+    },
+    "/v1/dashboard/hotspots": {
+      "get": {
+        "operationId": "DashboardController_hotspots",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lieux les plus verbalisés du mois dans la région de Dakar.",
+        "tags": [
+          "Tableau de bord"
+        ]
+      }
+    },
+    "/v1/dashboard/status": {
+      "get": {
+        "operationId": "DashboardController_status",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Infos de la sidebar : badge du registre et terminaux connectés.",
+        "tags": [
+          "Tableau de bord"
+        ]
+      }
+    },
+    "/v1/contraventions": {
+      "get": {
+        "operationId": "ContraventionsController_list",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Recherche : N°, plaque ou nom d'officier",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "statut",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "impayee",
+                "partielle",
+                "payee",
+                "annulee"
+              ]
+            }
+          },
+          {
+            "name": "zone_id",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "officer_id",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "per_page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContraventionPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Registre filtrable. Un officier ne voit que ses propres contraventions ; un commandant sa zone.",
+        "tags": [
+          "Contraventions"
+        ]
+      },
+      "post": {
+        "operationId": "ContraventionsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContraventionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContraventionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Émission d'une contravention. Mobile : l'officier connecté est le verbalisateur,\n`clientUuid` rend l'appel idempotent pour la synchronisation hors-ligne.\nLe propriétaire reçoit un SMS (modèle défini dans Admin › Paramètres).",
+        "tags": [
+          "Contraventions"
+        ]
+      }
+    },
+    "/v1/contraventions/counts": {
+      "get": {
+        "operationId": "ContraventionsController_counts",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Contraventions"
+        ]
+      }
+    },
+    "/v1/contraventions/{id}": {
+      "get": {
+        "operationId": "ContraventionsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContraventionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Contraventions"
+        ]
+      },
+      "patch": {
+        "operationId": "ContraventionsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateContraventionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContraventionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Contraventions"
+        ]
+      }
+    },
+    "/v1/contraventions/{id}/cancel": {
+      "post": {
+        "operationId": "ContraventionsController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContraventionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Contraventions"
+        ]
+      }
+    },
+    "/v1/contraventions/{id}/mark-paid": {
+      "post": {
+        "operationId": "ContraventionsController_markPaid",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkPaidDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Enregistre un paiement du reste dû (guichet / régularisation administrative).",
+        "tags": [
+          "Contraventions"
+        ]
+      }
+    },
+    "/v1/payments": {
+      "get": {
+        "operationId": "PaymentsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Journal des paiements confirmés (Trésor). Un officier ne voit que ses encaissements.",
+        "tags": [
+          "Paiements"
+        ]
+      },
+      "post": {
+        "operationId": "PaymentsController_record",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordPaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Encaissement terrain par l'officier (espèces, Wave, OM, carte).",
+        "tags": [
+          "Paiements"
+        ]
+      }
+    },
+    "/v1/payments/{ref}": {
+      "get": {
+        "operationId": "PaymentsController_receipt",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Reçu RCU-… (usager : uniquement ses propres reçus).",
+        "tags": [
+          "Paiements"
+        ]
+      }
+    },
+    "/v1/payments/intents": {
+      "post": {
+        "operationId": "PaymentsController_createIntent",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIntentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentIntentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Espace Usager : crée une intention de paiement Wave / Orange Money pour une ou plusieurs amendes.\nOuvrir `checkoutUrl`, puis suivre le statut via GET /payments/intents/:id ou l'événement `payment.confirmed`.",
+        "tags": [
+          "Paiements"
+        ]
+      }
+    },
+    "/v1/payments/intents/{id}": {
+      "get": {
+        "operationId": "PaymentsController_getIntent",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentIntentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Paiements"
+        ]
+      }
+    },
+    "/v1/finance/report": {
+      "get": {
+        "operationId": "FinanceController_report",
+        "parameters": [
+          {
+            "name": "month",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Rapport financier mensuel (page Paiements & Trésor). `month` au format AAAA-MM.",
+        "tags": [
+          "Trésor"
+        ]
+      }
+    },
+    "/v1/officers": {
+      "get": {
+        "operationId": "OfficersController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Officiers"
+        ]
+      },
+      "post": {
+        "operationId": "OfficersController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOfficerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Officiers"
+        ]
+      }
+    },
+    "/v1/officers/stats": {
+      "get": {
+        "operationId": "OfficersController_stats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Officiers"
+        ]
+      }
+    },
+    "/v1/officers/{id}": {
+      "get": {
+        "operationId": "OfficersController_detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Officiers"
+        ]
+      },
+      "patch": {
+        "operationId": "OfficersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOfficerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Officiers"
+        ]
+      }
+    },
+    "/v1/officers/{id}/suspend": {
+      "post": {
+        "operationId": "OfficersController_suspend",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Suspend l'agent : révoque ses jetons et verrouille son terminal (HTTP 423 à la prochaine requête).",
+        "tags": [
+          "Officiers"
+        ]
+      }
+    },
+    "/v1/officers/{id}/reactivate": {
+      "post": {
+        "operationId": "OfficersController_reactivate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Officiers"
+        ]
+      }
+    },
+    "/v1/officers/{id}/reset-password": {
+      "post": {
+        "operationId": "OfficersController_resetPassword",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Officiers"
+        ]
+      }
+    },
+    "/v1/owners": {
+      "get": {
+        "operationId": "OwnersController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Usagers (propriétaires)"
+        ]
+      }
+    },
+    "/v1/owners/stats": {
+      "get": {
+        "operationId": "OwnersController_stats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Usagers (propriétaires)"
+        ]
+      }
+    },
+    "/v1/owners/{id}": {
+      "get": {
+        "operationId": "OwnersController_detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Usagers (propriétaires)"
+        ]
+      },
+      "patch": {
+        "operationId": "OwnersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOwnerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Usagers (propriétaires)"
+        ]
+      }
+    },
+    "/v1/owners/{id}/remind": {
+      "post": {
+        "operationId": "OwnersController_remind",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Relance SMS individuelle.",
+        "tags": [
+          "Usagers (propriétaires)"
+        ]
+      }
+    },
+    "/v1/owners/remind-all": {
+      "post": {
+        "operationId": "OwnersController_remindAll",
+        "parameters": [],
+        "responses": {
+          "202": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Relance SMS de tous les débiteurs, envoyée en tâche de fond.\n(Passer à une file BullMQ/Redis quand le volume l'exigera.)",
+        "tags": [
+          "Usagers (propriétaires)"
+        ]
+      }
+    },
+    "/v1/vehicles": {
+      "get": {
+        "operationId": "VehiclesController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Véhicules"
+        ]
+      },
+      "post": {
+        "operationId": "VehiclesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVehicleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Enrôlement véhicule + propriétaire (App Officier) ou enregistrement admin.",
+        "tags": [
+          "Véhicules"
+        ]
+      }
+    },
+    "/v1/vehicles/stats": {
+      "get": {
+        "operationId": "VehiclesController_stats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Véhicules"
+        ]
+      }
+    },
+    "/v1/vehicles/{plate}": {
+      "get": {
+        "operationId": "VehiclesController_detail",
+        "parameters": [
+          {
+            "name": "plate",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Recherche par plaque (scan OCR). 404 → proposer l'enrôlement.",
+        "tags": [
+          "Véhicules"
+        ]
+      }
+    },
+    "/v1/vehicles/{plate}/flag": {
+      "post": {
+        "operationId": "VehiclesController_flag",
+        "parameters": [
+          {
+            "name": "plate",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlagVehicleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Véhicules"
+        ]
+      }
+    },
+    "/v1/infraction-types": {
+      "get": {
+        "operationId": "InfractionTypesController_list",
+        "parameters": [
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InfractionTypeDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Barème complet. Les terminaux mettent en cache la réponse et renvoient l'ETag\ndans If-None-Match : HTTP 304 si rien n'a changé.",
+        "tags": [
+          "Barème des infractions"
+        ]
+      },
+      "post": {
+        "operationId": "InfractionTypesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInfractionTypeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Barème des infractions"
+        ]
+      }
+    },
+    "/v1/infraction-types/stats": {
+      "get": {
+        "operationId": "InfractionTypesController_stats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Barème avec statistiques du mois (page Infractions & montants).",
+        "tags": [
+          "Barème des infractions"
+        ]
+      }
+    },
+    "/v1/infraction-types/{id}": {
+      "patch": {
+        "operationId": "InfractionTypesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateInfractionTypeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Le nouveau montant s'applique aux prochaines émissions ; les contraventions passées gardent leur montant figé.",
+        "tags": [
+          "Barème des infractions"
+        ]
+      },
+      "delete": {
+        "operationId": "InfractionTypesController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Suppression logique : l'historique des contraventions reste intact.",
+        "tags": [
+          "Barème des infractions"
+        ]
+      }
+    },
+    "/v1/zones": {
+      "get": {
+        "operationId": "ZonesController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Zones avec statistiques du mois : alimente la carte 3D et les cartes de zones.",
+        "tags": [
+          "Zones & commissariats"
+        ]
+      }
+    },
+    "/v1/zones/{id}/assign": {
+      "post": {
+        "operationId": "ZonesController_assign",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignOfficersDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Réaffecte des officiers à une zone.",
+        "tags": [
+          "Zones & commissariats"
+        ]
+      }
+    },
+    "/v1/admins": {
+      "get": {
+        "operationId": "AdminsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Admins & paramètres"
+        ]
+      },
+      "post": {
+        "operationId": "AdminsController_invite",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteAdminDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Invite un administrateur : lien d'activation envoyé par email (journalisé en dev).",
+        "tags": [
+          "Admins & paramètres"
+        ]
+      }
+    },
+    "/v1/admins/{id}/revoke": {
+      "post": {
+        "operationId": "AdminsController_revoke",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Admins & paramètres"
+        ]
+      }
+    },
+    "/v1/admins/{id}/restore": {
+      "post": {
+        "operationId": "AdminsController_restore",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Admins & paramètres"
+        ]
+      }
+    },
+    "/v1/settings": {
+      "get": {
+        "operationId": "AdminsController_getSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Paramètres généraux. Lisibles par les terminaux (nom de l'institution, délai de paiement).",
+        "tags": [
+          "Admins & paramètres"
+        ]
+      },
+      "put": {
+        "operationId": "AdminsController_putSettings",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Admins & paramètres"
+        ]
+      }
+    },
+    "/v1/notifications": {
+      "get": {
+        "operationId": "NotificationsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/v1/notifications/{id}/read": {
+      "patch": {
+        "operationId": "NotificationsController_read",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/v1/notifications/read-all": {
+      "post": {
+        "operationId": "NotificationsController_readAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/v1/uploads": {
+      "post": {
+        "operationId": "UploadsController_upload",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Fichiers"
+        ]
+      }
+    },
+    "/v1/exports/contraventions.xlsx": {
+      "get": {
+        "operationId": "ExportsController_xlsx",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Recherche : N°, plaque ou nom d'officier",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "statut",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "impayee",
+                "partielle",
+                "payee",
+                "annulee"
+              ]
+            }
+          },
+          {
+            "name": "zone_id",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "officer_id",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "per_page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Exports"
+        ]
+      }
+    },
+    "/v1/exports/contraventions.pdf": {
+      "get": {
+        "operationId": "ExportsController_pdf",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Recherche : N°, plaque ou nom d'officier",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "statut",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "impayee",
+                "partielle",
+                "payee",
+                "annulee"
+              ]
+            }
+          },
+          {
+            "name": "zone_id",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "officer_id",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "per_page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Exports"
+        ]
+      }
+    },
+    "/v1/exports/finance.pdf": {
+      "get": {
+        "operationId": "ExportsController_financePdf",
+        "parameters": [
+          {
+            "name": "month",
+            "required": false,
+            "in": "query",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Exports"
+        ]
+      }
+    },
+    "/v1/officer/me/dashboard": {
+      "get": {
+        "operationId": "OfficerAppController_dashboard",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Écran d'accueil : stats du jour, objectif et dernières contraventions.",
+        "tags": [
+          "App Officier"
+        ]
+      }
+    },
+    "/v1/officer/me": {
+      "patch": {
+        "operationId": "OfficerAppController_prefs",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOfficerPrefsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "App Officier"
+        ]
+      }
+    },
+    "/v1/officer/me/password": {
+      "post": {
+        "operationId": "OfficerAppController_password",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "App Officier"
+        ]
+      }
+    },
+    "/v1/me/summary": {
+      "get": {
+        "operationId": "UserAppController_summary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Écran d'accueil : total dû, véhicules, amendes récentes.",
+        "tags": [
+          "Espace Usager"
+        ]
+      }
+    },
+    "/v1/me/vehicles": {
+      "get": {
+        "operationId": "UserAppController_myVehicles",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VehicleDetailDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Espace Usager"
+        ]
+      },
+      "post": {
+        "operationId": "UserAppController_addVehicle",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVehicleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ajout d'un véhicule : s'il existe au fichier national, il doit déjà appartenir à l'usager.",
+        "tags": [
+          "Espace Usager"
+        ]
+      }
+    },
+    "/v1/me/vehicles/{plate}": {
+      "get": {
+        "operationId": "UserAppController_myVehicle",
+        "parameters": [
+          {
+            "name": "plate",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Espace Usager"
+        ]
+      }
+    },
+    "/v1/me/fines": {
+      "get": {
+        "operationId": "UserAppController_fines",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Espace Usager"
+        ]
+      }
+    },
+    "/v1/me/fines/{ref}": {
+      "get": {
+        "operationId": "UserAppController_fine",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContraventionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Espace Usager"
+        ]
+      }
+    },
+    "/v1/me/finances": {
+      "get": {
+        "operationId": "UserAppController_finances",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Écran Finances : total payé par mois (6 derniers mois) et reçus.",
+        "tags": [
+          "Espace Usager"
+        ]
+      }
+    },
+    "/v1/me/security": {
+      "patch": {
+        "operationId": "UserAppController_security",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SecurityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Espace Usager"
+        ]
+      }
+    },
+    "/v1/me/password": {
+      "post": {
+        "operationId": "UserAppController_password",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Espace Usager"
+        ]
+      }
+    },
+    "/v1/dev/checkout/{id}": {
+      "get": {
+        "operationId": "DevController_checkout",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Dev · simulateur opérateur"
+        ]
+      }
+    },
+    "/v1/dev/checkout/{id}/result": {
+      "post": {
+        "operationId": "DevController_result",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "success",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Équivaut au webhook opérateur (succès ou échec).",
+        "tags": [
+          "Dev · simulateur opérateur"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "SEN Contraventions API",
+    "description": "Backend unique de l’Admin Web, de l’App Officier et de l’Espace Usager.\n\n**Authentification** : `Authorization: Bearer <accessToken>` (15 min), renouvelé via `POST /v1/auth/refresh`.\n**Officier suspendu** : toute requête renvoie HTTP 423 `OFFICER_SUSPENDED` → verrouiller le terminal.\n**Temps réel** : Socket.IO, namespace `/ws`, `auth: { token }`. Événements : `contravention.created`, \n`payment.confirmed`, `infraction_types.updated`, `vehicle.flagged`, `notification.created`, `officer.suspended`.\n**Hors-ligne** : envoyer `clientUuid` (UUID v4) dans `POST /v1/contraventions` pour une synchronisation idempotente.\n**Montants** : entiers en FCFA. **Dates** : ISO 8601.",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "TokensDto": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "expiresIn": {
+            "type": "number",
+            "description": "Durée de validité du jeton d'accès, en secondes"
+          },
+          "kind": {
+            "enum": [
+              "admin",
+              "officer",
+              "user"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "accessToken",
+          "refreshToken",
+          "expiresIn",
+          "kind"
+        ]
+      },
+      "OtpChallengeDto": {
+        "type": "object",
+        "properties": {
+          "otpRequired": {
+            "type": "boolean"
+          },
+          "challengeId": {
+            "type": "string"
+          },
+          "maskedPhone": {
+            "type": "string",
+            "description": "Téléphone masqué, ex. +221 77 *** ** 67"
+          }
+        },
+        "required": [
+          "otpRequired",
+          "challengeId",
+          "maskedPhone"
+        ]
+      },
+      "OfficerLoginDto": {
+        "type": "object",
+        "properties": {
+          "matricule": {
+            "type": "string",
+            "description": "Matricule de l'agent, ex. PN-4471"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "matricule",
+          "password"
+        ]
+      },
+      "UserLoginDto": {
+        "type": "object",
+        "properties": {
+          "telephone": {
+            "type": "string",
+            "description": "Téléphone au format +221XXXXXXXXX (espaces tolérés)"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "telephone",
+          "password"
+        ]
+      },
+      "UserRegisterDto": {
+        "type": "object",
+        "properties": {
+          "cni": {
+            "type": "string",
+            "description": "Numéro de CNI du propriétaire tel qu'enregistré au fichier national"
+          },
+          "telephone": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          }
+        },
+        "required": [
+          "cni",
+          "telephone",
+          "password"
+        ]
+      },
+      "VerifyOtpDto": {
+        "type": "object",
+        "properties": {
+          "challengeId": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "minLength": 6,
+            "maxLength": 6
+          }
+        },
+        "required": [
+          "challengeId",
+          "code"
+        ]
+      },
+      "AdminLoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "ActivateAdminDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          }
+        },
+        "required": [
+          "token",
+          "password"
+        ]
+      },
+      "RefreshDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "refreshToken"
+        ]
+      },
+      "ContraventionItemDto": {
+        "type": "object",
+        "properties": {
+          "infractionTypeId": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "libelle": {
+            "type": "string"
+          },
+          "icone": {
+            "type": "string"
+          },
+          "montant": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "infractionTypeId",
+          "code",
+          "libelle",
+          "icone",
+          "montant"
+        ]
+      },
+      "ContraventionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "numero": {
+            "type": "string"
+          },
+          "dateHeure": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "plaque": {
+            "type": "string"
+          },
+          "vehicule": {
+            "type": "string"
+          },
+          "proprietaire": {
+            "type": "string"
+          },
+          "infraction": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContraventionItemDto"
+            }
+          },
+          "officierId": {
+            "type": "string",
+            "nullable": true
+          },
+          "officier": {
+            "type": "string",
+            "nullable": true
+          },
+          "zoneId": {
+            "type": "string"
+          },
+          "zone": {
+            "type": "string"
+          },
+          "montantTotal": {
+            "type": "number"
+          },
+          "montantPaye": {
+            "type": "number"
+          },
+          "resteAPayer": {
+            "type": "number"
+          },
+          "statut": {
+            "enum": [
+              "impayee",
+              "partielle",
+              "payee",
+              "annulee"
+            ],
+            "type": "string"
+          },
+          "canal": {
+            "enum": [
+              "admin",
+              "mobile"
+            ],
+            "type": "string"
+          },
+          "lieuTexte": {
+            "type": "string",
+            "nullable": true
+          },
+          "lat": {
+            "type": "number",
+            "nullable": true
+          },
+          "lng": {
+            "type": "number",
+            "nullable": true
+          },
+          "photoPreuveUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "qrPayload": {
+            "type": "string",
+            "description": "Contenu à encoder dans le QR code de l'avis"
+          }
+        },
+        "required": [
+          "id",
+          "numero",
+          "dateHeure",
+          "plaque",
+          "vehicule",
+          "proprietaire",
+          "infraction",
+          "items",
+          "officierId",
+          "officier",
+          "zoneId",
+          "zone",
+          "montantTotal",
+          "montantPaye",
+          "resteAPayer",
+          "statut",
+          "canal",
+          "lieuTexte",
+          "lat",
+          "lng",
+          "photoPreuveUrl",
+          "notes",
+          "qrPayload"
+        ]
+      },
+      "ContraventionPageDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContraventionDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "perPage": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "perPage"
+        ]
+      },
+      "CreateContraventionDto": {
+        "type": "object",
+        "properties": {
+          "plaque": {
+            "type": "string",
+            "description": "Plaque du véhicule (ex. DK-1234-AB). Le véhicule doit exister ou avoir été enrôlé."
+          },
+          "infractionTypeIds": {
+            "description": "Identifiants des infractions constatées (multi-sélection)",
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "zoneId": {
+            "type": "string",
+            "description": "Zone : déduite de l'officier si absente"
+          },
+          "officerId": {
+            "type": "string",
+            "description": "Officier verbalisateur (saisie admin uniquement ; côté mobile = l'officier connecté)"
+          },
+          "lieuTexte": {
+            "type": "string"
+          },
+          "lat": {
+            "type": "number"
+          },
+          "lng": {
+            "type": "number"
+          },
+          "dateHeure": {
+            "type": "string",
+            "description": "Horodatage du constat (utile en mode hors-ligne). Par défaut : maintenant."
+          },
+          "photoPreuveUrl": {
+            "type": "string",
+            "description": "URL de la photo preuve renvoyée par POST /uploads"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "clientUuid": {
+            "type": "string",
+            "description": "UUID généré par le terminal pour la synchronisation hors-ligne (idempotence)",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "plaque",
+          "infractionTypeIds"
+        ]
+      },
+      "UpdateContraventionDto": {
+        "type": "object",
+        "properties": {
+          "lieuTexte": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "zoneId": {
+            "type": "string"
+          }
+        }
+      },
+      "MarkPaidDto": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "especes",
+              "wave",
+              "orange_money",
+              "carte"
+            ]
+          },
+          "referenceExterne": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentAllocationDto": {
+        "type": "object",
+        "properties": {
+          "contraventionId": {
+            "type": "string"
+          },
+          "numero": {
+            "type": "string"
+          },
+          "montant": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "contraventionId",
+          "numero",
+          "montant"
+        ]
+      },
+      "PaymentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "numeroRecu": {
+            "type": "string",
+            "nullable": true,
+            "description": "N° de reçu RCU-AAAA-NNNNN (null tant que le paiement n'est pas confirmé)"
+          },
+          "mode": {
+            "enum": [
+              "especes",
+              "wave",
+              "orange_money",
+              "carte"
+            ],
+            "type": "string"
+          },
+          "montant": {
+            "type": "number"
+          },
+          "statut": {
+            "enum": [
+              "en_attente",
+              "confirme",
+              "echoue"
+            ],
+            "type": "string"
+          },
+          "canal": {
+            "enum": [
+              "admin",
+              "officer",
+              "usager"
+            ],
+            "type": "string"
+          },
+          "dateHeure": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "referenceExterne": {
+            "type": "string",
+            "nullable": true
+          },
+          "plaque": {
+            "type": "string",
+            "nullable": true
+          },
+          "encaissePar": {
+            "type": "string"
+          },
+          "allocations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentAllocationDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "numeroRecu",
+          "mode",
+          "montant",
+          "statut",
+          "canal",
+          "dateHeure",
+          "referenceExterne",
+          "plaque",
+          "encaissePar",
+          "allocations"
+        ]
+      },
+      "RecordPaymentDto": {
+        "type": "object",
+        "properties": {
+          "contraventions": {
+            "description": "Contraventions réglées (N° CNT-… ou identifiants)",
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "especes",
+              "wave",
+              "orange_money",
+              "carte"
+            ]
+          },
+          "montant": {
+            "type": "number",
+            "description": "Montant encaissé. Par défaut : le reste dû total (paiement partiel si inférieur).",
+            "minimum": 1
+          },
+          "referenceExterne": {
+            "type": "string",
+            "description": "Référence de transaction Wave / OM / TPE"
+          }
+        },
+        "required": [
+          "contraventions",
+          "mode"
+        ]
+      },
+      "CreateIntentDto": {
+        "type": "object",
+        "properties": {
+          "contraventions": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "wave",
+              "orange_money"
+            ]
+          }
+        },
+        "required": [
+          "contraventions",
+          "provider"
+        ]
+      },
+      "PaymentIntentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "numeroRecu": {
+            "type": "string",
+            "nullable": true,
+            "description": "N° de reçu RCU-AAAA-NNNNN (null tant que le paiement n'est pas confirmé)"
+          },
+          "mode": {
+            "enum": [
+              "especes",
+              "wave",
+              "orange_money",
+              "carte"
+            ],
+            "type": "string"
+          },
+          "montant": {
+            "type": "number"
+          },
+          "statut": {
+            "enum": [
+              "en_attente",
+              "confirme",
+              "echoue"
+            ],
+            "type": "string"
+          },
+          "canal": {
+            "enum": [
+              "admin",
+              "officer",
+              "usager"
+            ],
+            "type": "string"
+          },
+          "dateHeure": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "referenceExterne": {
+            "type": "string",
+            "nullable": true
+          },
+          "plaque": {
+            "type": "string",
+            "nullable": true
+          },
+          "encaissePar": {
+            "type": "string"
+          },
+          "allocations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentAllocationDto"
+            }
+          },
+          "checkoutUrl": {
+            "type": "string",
+            "description": "URL de paiement à ouvrir (Wave : lien de checkout ; OM : page de validation USSD)"
+          }
+        },
+        "required": [
+          "id",
+          "numeroRecu",
+          "mode",
+          "montant",
+          "statut",
+          "canal",
+          "dateHeure",
+          "referenceExterne",
+          "plaque",
+          "encaissePar",
+          "allocations",
+          "checkoutUrl"
+        ]
+      },
+      "CreateOfficerDto": {
+        "type": "object",
+        "properties": {
+          "prenom": {
+            "type": "string"
+          },
+          "nom": {
+            "type": "string"
+          },
+          "matricule": {
+            "type": "string"
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Sergent",
+              "Brigadier",
+              "Officier",
+              "Adjudant",
+              "Lieutenant",
+              "Capitaine",
+              "Commissaire"
+            ]
+          },
+          "zoneId": {
+            "type": "string"
+          },
+          "telephone": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "Mot de passe initial. Si absent, un mot de passe est généré et envoyé par SMS.",
+            "minLength": 8
+          }
+        },
+        "required": [
+          "prenom",
+          "nom",
+          "matricule",
+          "grade",
+          "zoneId"
+        ]
+      },
+      "UpdateOfficerDto": {
+        "type": "object",
+        "properties": {
+          "prenom": {
+            "type": "string"
+          },
+          "nom": {
+            "type": "string"
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Sergent",
+              "Brigadier",
+              "Officier",
+              "Adjudant",
+              "Lieutenant",
+              "Capitaine",
+              "Commissaire"
+            ]
+          },
+          "zoneId": {
+            "type": "string"
+          },
+          "telephone": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        }
+      },
+      "UpdateOwnerDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "VehicleDocumentDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "ASS",
+              "VT",
+              "CG"
+            ]
+          },
+          "label": {
+            "type": "string"
+          },
+          "ok": {
+            "type": "boolean"
+          },
+          "expiration": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "code",
+          "label",
+          "ok",
+          "expiration"
+        ]
+      },
+      "OwnerSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "prenom": {
+            "type": "string"
+          },
+          "nom": {
+            "type": "string"
+          },
+          "cni": {
+            "type": "string"
+          },
+          "telephone": {
+            "type": "string"
+          },
+          "quartier": {
+            "type": "string",
+            "nullable": true
+          },
+          "hasAppAccount": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "prenom",
+          "nom",
+          "cni",
+          "telephone",
+          "quartier",
+          "hasAppAccount"
+        ]
+      },
+      "VehicleDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "plaque": {
+            "type": "string"
+          },
+          "marque": {
+            "type": "string"
+          },
+          "modele": {
+            "type": "string"
+          },
+          "couleur": {
+            "type": "string",
+            "nullable": true
+          },
+          "annee": {
+            "type": "number",
+            "nullable": true
+          },
+          "type": {
+            "enum": [
+              "VP",
+              "Moto",
+              "Camion",
+              "Bus"
+            ],
+            "type": "string"
+          },
+          "carburant": {
+            "type": "string",
+            "nullable": true
+          },
+          "chassis": {
+            "type": "string",
+            "nullable": true
+          },
+          "flagged": {
+            "type": "boolean"
+          },
+          "flagReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "alerte": {
+            "type": "boolean",
+            "description": "Document expiré, amende impayée ou véhicule signalé"
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VehicleDocumentDto"
+            }
+          },
+          "proprietaire": {
+            "$ref": "#/components/schemas/OwnerSummaryDto"
+          },
+          "totalDu": {
+            "type": "number",
+            "description": "Somme restant due sur les amendes impayées / partielles"
+          },
+          "impayees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContraventionDto"
+            }
+          },
+          "historique": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContraventionDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "plaque",
+          "marque",
+          "modele",
+          "couleur",
+          "annee",
+          "type",
+          "carburant",
+          "chassis",
+          "flagged",
+          "flagReason",
+          "alerte",
+          "documents",
+          "proprietaire",
+          "totalDu",
+          "impayees",
+          "historique"
+        ]
+      },
+      "OwnerInputDto": {
+        "type": "object",
+        "properties": {
+          "prenom": {
+            "type": "string"
+          },
+          "nom": {
+            "type": "string"
+          },
+          "cni": {
+            "type": "string",
+            "description": "Si un propriétaire avec cette CNI existe déjà, il est réutilisé."
+          },
+          "telephone": {
+            "type": "string"
+          },
+          "adresse": {
+            "type": "string"
+          },
+          "quartier": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "photoCniUrl": {
+            "type": "string",
+            "description": "URL de la photo de la CNI (POST /uploads)"
+          }
+        },
+        "required": [
+          "prenom",
+          "nom",
+          "cni",
+          "telephone"
+        ]
+      },
+      "CreateVehicleDto": {
+        "type": "object",
+        "properties": {
+          "plaque": {
+            "type": "string"
+          },
+          "marque": {
+            "type": "string"
+          },
+          "modele": {
+            "type": "string"
+          },
+          "couleur": {
+            "type": "string"
+          },
+          "annee": {
+            "type": "number"
+          },
+          "type": {
+            "enum": [
+              "VP",
+              "Moto",
+              "Camion",
+              "Bus"
+            ],
+            "type": "string"
+          },
+          "carburant": {
+            "type": "string"
+          },
+          "chassis": {
+            "type": "string"
+          },
+          "assuranceExp": {
+            "type": "string"
+          },
+          "visiteTechExp": {
+            "type": "string"
+          },
+          "carteGriseOk": {
+            "type": "boolean"
+          },
+          "ownerId": {
+            "type": "string",
+            "description": "Propriétaire existant…"
+          },
+          "owner": {
+            "description": "…ou nouveau propriétaire (enrôlement terrain, étape 2)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OwnerInputDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "plaque",
+          "marque",
+          "modele",
+          "type"
+        ]
+      },
+      "FlagVehicleDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "InfractionTypeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "libelle": {
+            "type": "string"
+          },
+          "montantDefaut": {
+            "type": "number"
+          },
+          "icone": {
+            "type": "string"
+          },
+          "actif": {
+            "type": "boolean"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "libelle",
+          "montantDefaut",
+          "icone",
+          "actif",
+          "updatedAt"
+        ]
+      },
+      "CreateInfractionTypeDto": {
+        "type": "object",
+        "properties": {
+          "libelle": {
+            "type": "string"
+          },
+          "montantDefaut": {
+            "type": "number",
+            "description": "Montant par défaut en FCFA",
+            "minimum": 0
+          },
+          "icone": {
+            "type": "string",
+            "description": "Nom d'icône Phosphor (ex. gauge, traffic-signal)"
+          }
+        },
+        "required": [
+          "libelle",
+          "montantDefaut"
+        ]
+      },
+      "UpdateInfractionTypeDto": {
+        "type": "object",
+        "properties": {
+          "libelle": {
+            "type": "string"
+          },
+          "montantDefaut": {
+            "type": "number",
+            "minimum": 0
+          },
+          "actif": {
+            "type": "boolean"
+          },
+          "icone": {
+            "type": "string"
+          }
+        }
+      },
+      "AssignOfficersDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "InviteAdminDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateSettingsDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateOfficerPrefsDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "SecurityDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UserPasswordDto": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  }
+}

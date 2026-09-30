@@ -1,0 +1,24 @@
+# Configuration du déploiement SEN Contraventions sur le VPS.
+# Copier en deploy/deploy.conf (non versionné) pour modifier une valeur.
+# Tous les ports sont vérifiés LIBRES avant l'installation : rien d'existant n'est écrasé.
+
+APP_DIR=/opt/sen-contraventions
+REPO_URL=https://github.com/trrvssctt/sn-contravention.git
+BRANCH=main
+
+# Adresse publique (IP ou domaine) servie par Nginx
+PUBLIC_HOST=185.215.165.43
+# Port public Nginx dédié à l'app (les autres sites restent sur 80/443)
+PUBLIC_PORT=8090
+
+# Ports internes (écoute locale uniquement)
+API_PORT=4100
+WEB_PORT=3100
+DB_PORT=5440
+
+# Noms pm2 (préfixés pour ne jamais toucher aux apps existantes)
+PM2_API=sen-api
+PM2_WEB=sen-web
+
+# Garder le simulateur de paiement Wave/OM tant que les comptes marchands ne sont pas ouverts
+PAYMENT_SIMULATOR=true

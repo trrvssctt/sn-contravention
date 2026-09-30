@@ -1,0 +1,16 @@
+# Base de données de production : PostgreSQL 16, accessible uniquement depuis le VPS (127.0.0.1).
+services:
+  db:
+    image: postgres:16
+    container_name: sen-contraventions-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sen
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD manquant}
+      POSTGRES_DB: sen_contraventions
+    ports:
+      - "127.0.0.1:${DB_PORT:-5440}:5432"
+    volumes:
+      - sen-contraventions-db:/var/lib/postgresql/data
+volumes:
+  sen-contraventions-db:

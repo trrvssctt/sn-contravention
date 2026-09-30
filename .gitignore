@@ -1,0 +1,19 @@
+node_modules
+dist
+.next
+.env
+*.log
+apps/api/uploads/*
+!apps/api/uploads/.gitkeep
+next-env.d.ts
+
+# Déploiement (secrets et état propres au VPS)
+deploy/deploy.conf
+deploy/.secrets
+deploy/.web-slot
+deploy/.update.lock
+deploy/logs/
+apps/admin-web/.next-a
+apps/admin-web/.next-b
+.env.production.local
+.env*.local
